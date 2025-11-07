@@ -17,7 +17,7 @@ export const createProject = async (req, res) => {
       priority,
     } = req.body;
 
-    const workspace = await prisma.findUnique({
+    const workspace = await prisma.workspace.findUnique({
       where: { id: workspaceId },
       include: { members: { include: { user: true } } },
     });
@@ -71,7 +71,7 @@ export const createProject = async (req, res) => {
       await prisma.projectMember.createMany({
         data: membersToAdd.map((userId) => ({
           projectId: project.id,
-          userId: memberId,
+          userId,
         })),
       });
     }
@@ -86,7 +86,6 @@ export const createProject = async (req, res) => {
         },
         tasks: {
           include: { assignee: true, comments: { include: { user: true } } },
-          owner: true,
         },
       },
     });
@@ -95,7 +94,7 @@ export const createProject = async (req, res) => {
       .status(201)
       .json({
         project: projectWithMembers,
-        memmage: "Project created successfully",
+        message: "Project created successfully",
       });
   } catch (error) {
     console.error("Error creating project:", error);
@@ -230,7 +229,6 @@ export const addMemberToProject = async (req, res) => {
       data: {
         userId: user.id,
         projectId,
-      
       }
     })
     return res.status(200).json({
