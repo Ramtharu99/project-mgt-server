@@ -143,6 +143,11 @@ export const updateProject = async (req, res) => {
         status: "error",
         message: "Only admin can update project",
       });
+
+      const project = await prisma.project.findUnique({
+        where: { id },
+      })
+      
       if (!project) {
         return res.status(404).json({
           status: "error",
